@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Report - Istanfix</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Istanfix</h1>
+        <nav>
+            <a href="index.html">View Reports</a>
+            <a href="#">New Report</a>
+        </nav>
+        <div id="user-session-info">
+            <span id="logged-in-user"></span>
+            <button id="logout-button" style="margin-left: 10px; padding: 5px 10px; background-color: #d9534f; color: white; border: none; border-radius: 3px; cursor: pointer;">Logout</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="report-form">
+            <h2>Create New Report</h2>
+            <form id="new-report-form">
+                <div>
+                    <label for="category">Category:</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="pothole">Pothole</option>
+                        <option value="streetlight">Broken Streetlight</option>
+                        <option value="bench">Damaged Bench</option>
+                        <option value="trash">Trash/Waste</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="district">District:</label>
+                    <input type="text" id="district" name="district" required>
+                </div>
+                <div>
+                    <label for="address">Address Details:</label>
+                    <textarea id="address" name="address" rows="3" required></textarea>
+                </div>
+                <div>
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="5" required></textarea>
+                </div>
+                <div>
+                    <label for="image">Issue Image (Optional):</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                </div>
+                <div>
+                    <button type="button" id="getLocationBtn">Get My Current Location</button>
+                    <p id="locationStatus"></p>
+                    <input type="hidden" id="latitude" name="latitude">
+                    <input type="hidden" id="longitude" name="longitude">
+                </div>
+                <button type="submit">Submit Report</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Istanfix</p>
+    </footer>
+
+    <script src="script.js"></script> 
+    <!-- We might need a specific script for this page later, e.g., report-form.js -->
+</body>
+</html> 

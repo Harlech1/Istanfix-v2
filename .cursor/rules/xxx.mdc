@@ -1,0 +1,81 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# CursorRules
+
+## 🏷 Project Title
+Istanfix
+
+## 🧠 Project Purpose
+Istanfix is a database-driven information system designed to help users report and track public infrastructure problems (e.g. broken streetlights, potholes, damaged benches) across Istanbul. The project aims to provide students with hands-on experience in database modeling and application development. Keep it simple.
+
+## 🧱 Project Components
+
+### 1. Veri Modeli (Data Model)
+
+#### ✅ Gereksinim Analizi
+Users should be able to:
+- Report new infrastructure issues
+- View reported issues
+- Update the status of an issue
+- Filter/search issues by district or category
+- Admins can delete irrelevant/spam reports
+
+#### 🧩 Kavramsal Model
+Design a **Varlık-İlişki (ER) Şeması** including:
+- Primary Keys, Composite Attributes, Derived Attributes
+- Example Entities:
+  - User (ID, Name, Email, Role)
+  - Report (ID, Description, Image, Status, CreatedAt)
+  - Location (ID, District, Address)
+  - Category (ID, Name)
+  - Admin (ID, UserID)
+
+#### 🔁 Mantıksal Model
+Convert the ER schema into a **Relational Model**:
+- Normalize to at least **3NF** or **BCNF**
+- Clearly list all functional dependencies
+
+#### 💽 Fiziksel Model
+Create database tables using:
+- Preferred DBMS: SQLite
+- Use appropriate datatypes and constraints
+
+### 2. Uygulama (Application)
+
+- Platform: Web or Desktop
+- Required Features:
+  - View existing reports
+  - Create a new report
+  - Edit an existing report
+  - Delete a report (admin only)
+- Technologies: use pure html + css + js
+
+### 3. Rapor (Final Report)
+
+The report must include:
+- Detailed requirement list
+- ER diagram
+- Relational schema
+- Functional dependencies
+- Normalization steps (if needed)
+- DDL (CREATE TABLE statements)
+- SQL Queries used in the app (SELECT, INSERT, UPDATE, DELETE)
+- Triggers, functions, and procedures (if any)
+- Application architecture overview
+- Technologies used
+- Team member responsibilities
+
+## ✅ Submission Checklist
+
+- [ ] ER Diagram (PDF/Image)
+- [ ] Relational Schema & Normalization Table
+- [ ] SQL DDL and Sample Queries
+- [ ] Working Application (Web/Desktop)
+- [ ] Project Report (PDF)
+- [ ] GitHub/Repo Link (if used)
+
+

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Istanfix</title>
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            font-family: sans-serif;
+        }
+        #signup-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        #signup-container h1 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        #signup-container h2 {
+            margin-bottom: 20px;
+            color: #555;
+            font-weight: normal;
+        }
+        #signup-form div {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        #signup-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        #signup-form input[type="text"],
+        #signup-form input[type="email"],
+        #signup-form input[type="password"],
+        #signup-form input[type="url"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        #signup-form button[type="submit"] {
+            background-color: #5cb85c; /* Green for sign up */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        #signup-form button[type="submit"]:hover {
+            background-color: #4cae4c;
+        }
+        .login-link {
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .login-link a {
+            color: #337ab7;
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .app-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="signup-container">
+        <h1 class="app-title">Istanfix</h1>
+        <h2>Create Your Account</h2>
+        <form id="signup-form">
+            <div>
+                <label for="signup-name">Full Name:</label>
+                <input type="text" id="signup-name" name="name" required>
+            </div>
+            <div>
+                <label for="signup-email">Email Address:</label>
+                <input type="email" id="signup-email" name="email" required>
+            </div>
+            <div>
+                <label for="signup-password">Password:</label>
+                <input type="password" id="signup-password" name="password" required minlength="6">
+            </div>
+            <div>
+                <label for="signup-photo-url">Profile Photo URL (Optional):</label>
+                <input type="url" id="signup-photo-url" name="profile_photo_url" placeholder="https://example.com/yourphoto.jpg">
+            </div>
+            <button type="submit">Sign Up</button>
+        </form>
+        <div class="login-link">
+            <p>Already have an account? <a href="login.html">Login here</a></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script> 
+</body>
+</html> 
