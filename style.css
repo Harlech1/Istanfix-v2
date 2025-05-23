@@ -1,126 +1,882 @@
-/* Basic Reset */
-body, h1, h2, p, ul, li, a, form, input, textarea, button {
+/* === Color Variables === */
+:root {
+    /* Light Mode Colors (default) */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f8f8;
+    --bg-tertiary: #f0f2f5;
+    --text-primary: #1d1d1f;
+    --text-secondary: #3c3c43;
+    --text-tertiary: #6c6c70;
+    --border-color: #e5e5e5;
+    --accent-color: #007aff;
+    --accent-hover: #005ec4;
+    --danger-color: #ff3b30;
+    --warning-color: #ff9500;
+    --success-color: #34c759;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --card-bg: #f9f9f9;
+    --input-bg: #f9f9f9;
+    --comment-bg: #f8f8f8;
+}
+
+/* Dark Mode Colors */
+.dark-mode {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-tertiary: #252525;
+    --text-primary: #f5f5f7;
+    --text-secondary: #d1d1d6;
+    --text-tertiary: #a1a1a6;
+    --border-color: #333333;
+    --accent-color: #0a84ff;
+    --accent-hover: #409cff;
+    --danger-color: #ff453a;
+    --warning-color: #ff9f0a;
+    --success-color: #30d158;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --card-bg: #1e1e1e;
+    --input-bg: #333333;
+    --comment-bg: #252525;
+}
+
+/* === Base Styles & Resets === */
+body, html {
     margin: 0;
     padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
     box-sizing: border-box;
 }
 
-body {
-    font-family: sans-serif;
-    line-height: 1.6;
-    background-color: #f4f4f4;
-    color: #333;
-    padding: 20px;
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-header {
-    background: #333;
-    color: #fff;
-    padding: 1rem 0;
-    text-align: center;
-    margin-bottom: 20px;
+p {
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
 }
 
-header h1 {
-    margin-bottom: 0.5rem;
+strong {
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-header nav a {
-    color: #fff;
+a {
+    color: var(--accent-color);
     text-decoration: none;
-    margin: 0 10px;
+    font-weight: 500;
 }
 
-header nav a:hover {
+a:hover {
     text-decoration: underline;
 }
 
+/* === App Container / Main Layout === */
 main {
-    background: #fff;
     padding: 20px;
-    border-radius: 5px;
+    background-color: var(--bg-primary);
 }
 
-#reports-list h2, #report-form h2 {
-    margin-bottom: 15px;
-    color: #333;
+/* === Header === */
+header {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-footer {
-    text-align: center;
-    margin-top: 20px;
-    padding-top: 10px;
-    border-top: 1px solid #ccc;
+.logo-container {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0; /* Prevent logo from shrinking */
+    min-width: 150px;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+header h1 {
+    font-size: 1.6em; 
+    font-weight: 700; /* Bolder app title */
+    margin-bottom: 0;
+    cursor: pointer; /* If it links to home */
+    flex-shrink: 0; /* Prevent title from shrinking too much */
+    flex-basis: auto; /* Explicit basis */
+}
+
+header nav {
+    flex-grow: 1; /* Allow nav to take up available space */
+    text-align: left; /* Left align the links */
+    display: flex; /* Use flexbox for better alignment */
+    justify-content: flex-start; /* Left align buttons */
+    align-items: center; /* Center vertically */
+    gap: 20px; /* Add consistent spacing between buttons */
+    padding-left: 20px; /* Add some padding from the left edge */
+}
+
+header nav a {
+    background-color: #007aff; /* Button background color */
+    color: white; /* Button text color */
+    margin: 0; /* Remove margin as we're using gap for spacing */
+    font-weight: 500;
+    font-size: 0.9em; /* Slightly smaller font for buttons to fit well */
+    padding: 8px 15px; /* Padding for button appearance */
+    border-radius: 8px; /* Rounded corners for buttons */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: inline-block; /* Ensure proper spacing and centering */
+    text-decoration: none; /* Remove underline */
+    min-width: 120px; /* Set a minimum width for consistent button width */
+    text-align: center; /* Ensure text is centered in the button */
+}
+
+header nav a:hover {
+    background-color: #005ec4; /* Darker blue on hover */
+    text-decoration: none;
+    transform: translateY(-1px); /* Slight lift effect */
+}
+
+header nav a:active {
+    transform: translateY(0px); /* Press down effect */
+    background-color: #004aad; /* Even darker blue for active state */
+}
+
+/* Special styling for the "active" or current page nav link, if needed later */
+/* header nav a.active {
+    background-color: #005ec4; 
+    font-weight: 600;
+} */
+
+#user-session-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    flex-basis: auto;
+    min-width: 150px;
+}
+
+#logged-in-user {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+}
+
+#logged-in-user img {
+    width: 28px;
+    height: 28px;
+    border-radius: 14px; /* Ensure perfect circle */
+    vertical-align: middle;
+    margin-right: 8px;
+    border: 1px solid #ddd;
+}
+
+#logout-button {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+#logout-button:hover {
+    background-color: #e02e24; /* Slightly darker red on hover */
+    transform: translateY(-1px); /* Slight lift effect like nav buttons */
+}
+
+#logout-button:active {
+    transform: translateY(0); /* Press effect */
+    background-color: #c7251c; /* Even darker when pressed */
+}
+
+#logout-button .icon {
+    margin-right: 6px; /* Increased space between icon and text */
+    width: 16px;
+    height: 16px;
+}
+
+/* === Forms (General Styling) === */
+.form-container {
+    background: var(--bg-primary);
+    padding: 30px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px var(--shadow-color);
+    max-width: 420px;
+    margin: 60px auto;
+}
+
+/* Styles for forms within the main content area (e.g. report.html) */
+main form h2 {
+    font-size: 1.6em;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: var(--text-primary);
+}
+
+main form div {
+    margin-bottom: 18px;
+}
+
+main form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: var(--text-secondary);
     font-size: 0.9em;
 }
 
-/* Form Styling */
-#new-report-form div {
-    margin-bottom: 15px;
-}
-
-#new-report-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-#new-report-form input[type="text"],
-#new-report-form textarea,
-#new-report-form select {
+main form input[type="text"],
+main form input[type="email"],
+main form input[type="password"],
+main form input[type="url"],
+main form select,
+main form textarea {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     font-size: 1em;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-#new-report-form button[type="submit"] {
-    background-color: #333;
+main form input:focus,
+main form select:focus,
+main form textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+    background-color: var(--bg-primary);
+}
+
+main form button[type="submit"], main .action-button {
+    background-color: #007aff;
     color: white;
-    padding: 10px 15px;
+    padding: 12px 20px; /* Larger padding for primary actions */
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 1em;
+    font-weight: 600; /* Bolder text for primary buttons */
+    transition: background-color 0.2s ease;
 }
 
-#new-report-form button[type="submit"]:hover {
-    background-color: #555;
+main form button[type="submit"]:hover, main .action-button:hover {
+    background-color: #005ec4; /* Slightly darker blue */
 }
 
-/* Report Item Styling (for index.html) */
+#getLocationBtn {
+    background-color: rgba(0, 122, 255, 0.1); /* Light blue background */
+    color: #007aff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9em;
+    margin-bottom: 8px;
+    transition: background-color 0.2s ease;
+}
+
+#getLocationBtn:hover {
+    background-color: rgba(0, 122, 255, 0.15);
+}
+
+#locationStatus {
+    font-size: 0.8em;
+    color: #6c6c70; /* Softer grey */
+    min-height: 1.1em; 
+}
+
+/* === Report List (index.html) === */
+#reports-list h2 {
+    font-size: 1.5em; /* Reduced size */
+    font-weight: 700; /* Bolder section title */
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.reports-container {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px; /* Added top margin for spacing */
+}
+
 .report-item {
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    background-color: #f9f9f9;
+    border-bottom: 1px solid var(--border-color);
+    padding: 18px 5px;
+    margin-bottom: 0;
 }
+
+.report-item:last-child {
+    border-bottom: none; /* No border for the last item */
+}
+
+/* .report-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+} */ /* Remove hover effect if it's not a card */
 
 .report-item h3 {
     margin-top: 0;
-    margin-bottom: 5px;
-    color: #333;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-size: 1.2em; /* Slightly larger */
+    font-weight: 700; /* Increased boldness for report title */
 }
 
 .report-item p {
-    margin-bottom: 5px;
-    font-size: 0.95em;
+    margin-bottom: 6px;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+}
+
+/* Explicitly style the text part of labels like "District:", "Address:" which use <strong> */
+.report-item p strong {
+    font-weight: 600; /* Ensure these labels are bold */
+    color: var(--text-primary);
 }
 
 .report-item .status {
-    font-weight: bold;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 15px; /* Pill-shaped status tags */
+    font-size: 0.75em; /* Smaller status text */
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+/* Status colors remain the same */
+.report-item .status-open { background-color: #ff3b30; }
+.report-item .status-in-progress { background-color: #ff9500; }
+.report-item .status-resolved { background-color: #34c759; }
+
+.report-item .user-avatar {
+    width: 24px; /* Slightly larger avatar */
+    height: 24px;
+    border-radius: 12px; /* Ensure perfect circle */
+    vertical-align: middle;
+    margin-right: 6px;
+    border: 1px solid #ddd;
 }
 
-.report-item .status-open {
-    color: #d9534f; /* Red */
+.report-user strong { /* Targets "Reported by:" text specifically */
+    font-weight: 700 !important; /* Make "Reported by:" even bolder */
 }
 
-.report-item .status-in-progress {
-    color: #f0ad4e; /* Orange */
+.report-user {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    margin-bottom: 0px !important; /* Reduced margin from 10px to 0px */
+    display: flex; /* Align avatar and text */
+    align-items: center;
 }
 
-.report-item .status-resolved {
-    color: #5cb85c; /* Green */
+.report-item-actions button {
+    background-color: transparent;
+    color: #007aff;
+    border: none;
+    padding: 8px 8px; /* Slightly more padding for touch */
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em; /* Slightly larger icon buttons */
+    font-weight: 500;
+    margin-right: 5px;
+    line-height: 1; /* For better icon alignment */
+    transition: background-color 0.2s ease;
+}
+
+.report-item-actions button:hover {
+    background-color: rgba(0, 122, 255, 0.1); /* Subtle blue hover */
+}
+
+.report-item-actions button .icon {
+    margin-right: 3px; /* Space between icon and text if any */
+}
+
+.report-item-actions {
+    margin-top: 12px;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px 0;
+    border-top: 1px solid #e5e5e5;
+    font-size: 0.85em;
+    color: #8a8a8e;
+}
+
+/* body.auth-page adjustments for consistency if any needed */
+body.auth-page {
+    background-color: var(--bg-tertiary); /* Ensure this background for auth pages */
+}
+
+/* Ensure form elements on auth pages also get the new sizing if they aren't using main form selectors */
+.auth-page form input[type="text"],
+.auth-page form input[type="email"],
+.auth-page form input[type="password"],
+.auth-page form input[type="url"] {
+    padding: 12px 14px; /* Consistent padding */
+    font-size: 1em;
+    border-radius: 8px;
+    border-color: var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.auth-page form button[type="submit"] {
+    padding: 12px 20px;
+    font-size: 1.05em;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+.auth-page .form-container h2 { /* Already have .auth-page h2, but this is more specific */
+    font-size: 1.3em;
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 25px;
+}
+
+/* Icon styling placeholder */
+.icon {
+    display: inline-block;
+    width: 1.1em; /* General icon size */
+    height: 1.1em;
+    vertical-align: -0.15em; /* Fine-tune vertical alignment */
+    fill: currentColor; /* For SVGs to inherit color */
+    margin-right: 0.4em;
+}
+
+/* Remove specific icon styling for nav links as icons were removed */
+/* header nav a .icon {
+    width: 1em; height: 1em;
+    margin-right: 5px;
+    vertical-align: -0.1em;
+} */
+
+#logout-button .icon {
+    width: 1em; height: 1em;
+    margin-right: 5px;
+    vertical-align: -0.1em;
+}
+
+.report-item-actions button .icon {
+    width: 1em; height: 1em;
+    margin-right: 4px; /* Reduced margin if only icon + text */
+    vertical-align: -0.125em;
+}
+
+/* === Auth Pages (Login/Signup) === */
+.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--bg-tertiary);
+    padding: 20px;
+}
+
+.auth-container {
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+}
+
+.auth-logo {
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.auth-logo h1 {
+    font-size: 2rem;
+    color: var(--text-primary);
+}
+
+.auth-logo .logo {
+    width: 50px;
+    height: 50px;
+}
+
+.form-container {
+    background: var(--bg-primary);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px var(--shadow-color);
+    width: 100%;
+}
+
+.form-container h2 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    background-color: var(--input-bg);
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+    background-color: var(--bg-primary);
+}
+
+.input-hint {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.optional {
+    color: var(--text-tertiary);
+    font-weight: normal;
+    font-size: 0.85rem;
+}
+
+.btn-primary {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #005ec4;
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    background-color: #004aad;
+}
+
+.form-links {
+    margin-top: 24px;
+    font-size: 0.95rem;
+    color: var(--text-tertiary);
+}
+
+.form-links a {
+    color: #007aff;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.form-links a:hover {
+    text-decoration: underline;
+}
+
+/* The previous auth-page styles can be safely removed since we've replaced them */
+
+/* Specific styles for elements in login/signup if needed */
+#login-container, #signup-container {
+    /* These IDs are used in login.html/signup.html for the main form block */
+    /* We are now styling based on .form-container, so these ID-specific styles in HTML can be removed/reduced */
+    /* For now, let them be, but new designs should use .form-container */
+}
+
+/* === Comments Styling === */
+.comments-section {
+    margin-top: 20px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 15px;
+}
+
+.comments-section h4 {
+    font-size: 1em;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.comments-container {
+    margin-bottom: 15px;
+}
+
+.comment-item {
+    background-color: var(--comment-bg);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.user-avatar-small {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 8px;
+    border: 1px solid #ddd;
+}
+
+.comment-author {
+    font-weight: 600;
+    margin-right: 10px;
+    color: var(--text-primary);
+    font-size: 0.85em;
+}
+
+.comment-date {
+    font-size: 0.8em;
+    color: var(--text-tertiary);
+    flex-grow: 1;
+}
+
+.comment-content {
+    line-height: 1.4;
+    word-break: break-word; /* Ensures long words don't overflow */
+    font-size: 0.9em;
+}
+
+.delete-comment-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--danger-color);
+    padding: 2px 6px;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    margin-left: auto;
+}
+
+.delete-comment-btn:hover {
+    opacity: 1;
+}
+
+.add-comment-form {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.add-comment-form textarea {
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    resize: none;
+    height: 40px;
+    min-height: 40px;
+    font-family: inherit;
+    font-size: 0.9em;
+    flex: 1;
+    line-height: 20px;
+    overflow-y: hidden;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.add-comment-form textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.2);
+}
+
+.add-comment-form button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0 15px;
+    font-weight: 500;
+    font-size: 0.9em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    height: 40px;
+    min-width: 70px;
+    white-space: nowrap;
+}
+
+.add-comment-form button:hover {
+    background-color: var(--accent-hover);
+}
+
+.add-comment-form button svg {
+    margin-right: 6px;
+}
+
+.login-to-comment {
+    font-size: 0.85em;
+    color: var(--text-tertiary);
+    text-align: center;
+    margin: 10px 0;
+}
+
+.no-comments, .loading-comments, .error-loading {
+    text-align: center;
+    color: var(--text-tertiary);
+    font-style: italic;
+    padding: 10px 0;
+    font-size: 0.85em;
+}
+
+.icon-small {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* === Report Layout for Side-by-Side View === */
+.report-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.report-details {
+    flex: 1;  /* Take up 1/3 of the space */
+}
+
+.comments-section {
+    flex: 2;  /* Take up 2/3 of the space */
+    margin-top: 0;  /* Override the previous top margin */
+    border-top: none;  /* Remove top border since it's now on the side */
+    border-left: 1px solid var(--border-color);  /* Add left border instead */
+    padding-top: 0;  /* Remove top padding */
+    padding-left: 20px;  /* Add left padding instead */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .report-layout {
+        flex-direction: column;  /* Stack on mobile */
+    }
+    
+    .comments-section {
+        border-left: none;  /* Remove left border on mobile */
+        border-top: 1px solid var(--border-color);  /* Add top border back on mobile */
+        padding-left: 0;  /* Remove left padding on mobile */
+        padding-top: 15px;  /* Add top padding back on mobile */
+        margin-top: 15px;  /* Add top margin back on mobile */
+    }
+}
+
+/* === Comments Styling Updates === */
+.comments-container {
+    max-height: 400px;  /* Limit height to avoid too tall columns */
+    overflow-y: auto;  /* Add scrolling for many comments */
+}
+
+.comment-item {
+    background-color: var(--comment-bg);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.add-comment-form textarea {
+    font-size: 0.9em;  /* Slightly smaller font for better fit */
+}
+
+/* Report Image */
+.report-image {
+    margin: 15px 0;
+}
+
+.report-image img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    max-height: 300px;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+}
+
+/* Dark Mode Toggle */
+.dark-mode-toggle {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.dark-mode-toggle svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--text-secondary);
+}
+
+.dark-mode .dark-mode-toggle svg {
+    fill: var(--text-primary);
+}
+
+body.dark-mode .auth-page {
+    background-color: var(--bg-secondary);
 } 

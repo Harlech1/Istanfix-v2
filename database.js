@@ -16,6 +16,7 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
             
             createUsersTable();
             createReportsTable();
+            createCommentsTable();
             enableForeignKeys();
         });
     }
@@ -39,6 +40,7 @@ function createUsersTable() {
             email TEXT NOT NULL UNIQUE,
             hashed_password TEXT NOT NULL,
             profile_photo_url TEXT,
+            role TEXT NOT NULL DEFAULT 'user',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
     `;
@@ -91,6 +93,27 @@ function createReportsTable() {
                     console.log('updated_at trigger for reports table created or already exists.');
                 }
             });
+        }
+    });
+}
+
+function createCommentsTable() {
+    const createTableSql = `
+        CREATE TABLE IF NOT EXISTS comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            report_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            content TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+    `;
+    db.run(createTableSql, (err) => {
+        if (err) {
+            console.error('Error creating comments table', err.message);
+        } else {
+            console.log('Comments table created or already exists.');
         }
     });
 }
