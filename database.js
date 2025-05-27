@@ -9,11 +9,6 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
     } else {
         console.log('Connected to the Istanfix SQLite database.');
         db.serialize(() => {
-            // For development: drop tables to easily apply schema changes.
-            // In production, use migrations.
-            // db.run("DROP TABLE IF EXISTS reports");
-            // db.run("DROP TABLE IF EXISTS users");
-            
             createUsersTable();
             createReportsTable();
             createCommentsTable();
@@ -39,7 +34,6 @@ function createUsersTable() {
             name TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
             hashed_password TEXT NOT NULL,
-            profile_photo_url TEXT,
             role TEXT NOT NULL DEFAULT 'user',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
@@ -63,7 +57,7 @@ function createReportsTable() {
             description TEXT NOT NULL,
             latitude REAL,
             longitude REAL,
-            image_path TEXT,                          -- Path to an uploaded image (optional)
+            image_path TEXT,                         
             status TEXT NOT NULL DEFAULT 'open',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,

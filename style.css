@@ -50,6 +50,9 @@ body, html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 * {
@@ -86,6 +89,7 @@ a:hover {
 main {
     padding: 20px;
     background-color: var(--bg-primary);
+    flex: 1;
 }
 
 /* === Header === */
@@ -436,9 +440,11 @@ footer {
     text-align: center;
     margin-top: 30px;
     padding: 20px 0;
-    border-top: 1px solid #e5e5e5;
+    border-top: 1px solid var(--border-color);
     font-size: 0.85em;
-    color: #8a8a8e;
+    color: var(--text-tertiary);
+    background-color: var(--bg-primary);
+    width: 100%;
 }
 
 /* body.auth-page adjustments for consistency if any needed */

@@ -58,7 +58,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // POST /api/auth/signup
 app.post('/api/auth/signup', async (req, res) => {
-    const { name, email, password, profile_photo_url, role, gov_verification_code } = req.body;
+    const { name, email, password, role, gov_verification_code } = req.body;
 
     if (!name || !email || !password) {
         return res.status(400).json({ "error": "Name, email, and password are required." });
@@ -73,8 +73,7 @@ app.post('/api/auth/signup', async (req, res) => {
     let userRole = role || 'user';
     
     // If trying to register as government official, verify the code
-    // Simple verification for demo - in production use more secure methods
-    const GOV_VERIFICATION_CODE = "IST2023GOV"; // This would be stored securely in a real app
+    const GOV_VERIFICATION_CODE = "IST2025GOV";
     if (userRole === 'government' && gov_verification_code !== GOV_VERIFICATION_CODE) {
         return res.status(403).json({ "error": "Invalid government verification code." });
     }
@@ -92,8 +91,8 @@ app.post('/api/auth/signup', async (req, res) => {
         // Hash password
         try {
             const hashedPassword = await bcrypt.hash(password, 10); // 10 is salt rounds
-            const insertSql = 'INSERT INTO users (name, email, hashed_password, profile_photo_url, role) VALUES (?, ?, ?, ?, ?)';
-            const params = [name, email, hashedPassword, profile_photo_url || null, userRole];
+            const insertSql = 'INSERT INTO users (name, email, hashed_password, role) VALUES (?, ?, ?, ?)';
+            const params = [name, email, hashedPassword, userRole];
 
             db.run(insertSql, params, function(err) {
                 if (err) {
@@ -126,7 +125,7 @@ app.post('/api/auth/login', (req, res) => {
             return res.status(500).json({ "error": err.message });
         }
         if (!user) {
-            return res.status(400).json({ "error": "Invalid email or password." }); // Generic message for security
+            return res.status(400).json({ "error": "Invalid email or password." });
         }
 
         // Compare password
@@ -140,7 +139,6 @@ app.post('/api/auth/login', (req, res) => {
                         id: user.id,
                         name: user.name,
                         email: user.email,
-                        profile_photo_url: user.profile_photo_url,
                         role: user.role // Include role in response
                     }
                 });
@@ -159,10 +157,10 @@ app.post('/api/auth/login', (req, res) => {
 // GET all reports (now includes user info)
 app.get('/api/reports', (req, res) => {
     const sql = `
-        SELECT r.*, u.name as user_name, u.profile_photo_url as user_photo_url 
-        FROM reports r
-        LEFT JOIN users u ON r.user_id = u.id
-        ORDER BY r.created_at DESC
+        SELECT reports.*, users.name as user_name 
+        FROM reports
+        LEFT JOIN users ON reports.user_id = users.id
+        ORDER BY reports.created_at DESC
     `;
     db.all(sql, [], (err, rows) => {
         if (err) {
@@ -207,10 +205,10 @@ app.post('/api/reports', upload.single('image'), (req, res) => {
         // Fetch the newly created report with user details to return it
         const newReportId = this.lastID;
         const selectNewReportSql = `
-            SELECT r.*, u.name as user_name, u.profile_photo_url as user_photo_url 
-            FROM reports r
-            LEFT JOIN users u ON r.user_id = u.id
-            WHERE r.id = ?
+            SELECT reports.*, users.name as user_name 
+            FROM reports
+            LEFT JOIN users ON reports.user_id = users.id
+            WHERE reports.id = ?
         `;
         db.get(selectNewReportSql, [newReportId], (selectErr, newReport) => {
             if (selectErr) {
@@ -307,7 +305,7 @@ app.get('/api/reports/:reportId/comments', (req, res) => {
     const reportId = req.params.reportId;
     
     const sql = `
-        SELECT c.*, u.name as user_name, u.profile_photo_url as user_photo_url, u.role as user_role
+        SELECT c.*, u.name as user_name, u.role as user_role
         FROM comments c
         LEFT JOIN users u ON c.user_id = u.id
         WHERE c.report_id = ?
@@ -373,7 +371,7 @@ app.post('/api/reports/:reportId/comments', (req, res) => {
                 // Fetch the newly created comment with user details
                 const commentId = this.lastID;
                 const selectCommentSql = `
-                    SELECT c.*, u.name as user_name, u.profile_photo_url as user_photo_url, u.role as user_role
+                    SELECT c.*, u.name as user_name, u.role as user_role
                     FROM comments c
                     LEFT JOIN users u ON c.user_id = u.id
                     WHERE c.id = ?

@@ -1,4 +1,3 @@
-// JavaScript for Istanfix application will go here.
 console.log("Istanfix script loaded.");
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -69,11 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             userDisplayText += ' 🏛️ (Government Official)';
         }
         
-        if (loggedInUser.profile_photo_url) {
-            loggedInUserDisplay.innerHTML = `<img src="${loggedInUser.profile_photo_url}" alt="${loggedInUser.name}" style="width: 30px; height: 30px; border-radius: 50%; vertical-align: middle; margin-right: 8px;"> ${userDisplayText}`;
-        } else {
-            loggedInUserDisplay.textContent = userDisplayText;
-        }
+        loggedInUserDisplay.textContent = userDisplayText;
     }
     if (logoutButton) {
         logoutButton.style.display = loggedInUser ? 'inline-block' : 'none'; // Show only if logged in
@@ -216,7 +211,6 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const response = await fetch('/api/reports', {
                     method: 'POST',
-                    // Don't set Content-Type header - it will be set automatically with the boundary
                     body: formData,
                 });
                 if (!response.ok) {
@@ -289,11 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let userInfoHTML = '';
                 if (report.user_name) {
-                    userInfoHTML = `<p class="report-user">`;
-                    if (report.user_profile_photo_url) {
-                        userInfoHTML += `<img src="${report.user_profile_photo_url}" alt="${report.user_name}" class="user-avatar"> `;
-                    }
-                    userInfoHTML += `<strong>👤 Reported by:</strong> ${report.user_name}</p>`;
+                    userInfoHTML = `<p class="report-user"><strong>👤 Reported by:</strong> ${report.user_name}</p>`;
                 } else {
                     userInfoHTML = `<p class="report-user"><strong>👤 Reported by:</strong> Anonymous (user data unavailable)</p>`;
                 }
@@ -481,7 +471,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 commentsHTML += `
                     <div class="comment-item" id="comment-${comment.id}">
                         <div class="comment-header">
-                            ${comment.user_photo_url ? `<img src="${comment.user_photo_url}" alt="${comment.user_name}" class="user-avatar-small">` : ''}
                             <span class="comment-author">${userDisplay}</span>
                             <span class="comment-date">${new Date(comment.created_at).toLocaleString()}</span>
                             ${canDelete ? `
