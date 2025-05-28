@@ -174,7 +174,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- New Report Form Handler (report.html) ---
+    // Load categories for the report form
+    const categorySelect = document.getElementById('category_id');
+    if (categorySelect) {
+        loadCategories(categorySelect);
+    }
+
+    // Load districts for the report form
+    const districtSelect = document.getElementById('district_id');
+    if (districtSelect) {
+        loadDistricts(districtSelect);
+        
+        // Add event listener to district select to load neighborhoods when district changes
+        districtSelect.addEventListener('change', function() {
+            const neighborhoodSelect = document.getElementById('neighborhood_id');
+            if (neighborhoodSelect) {
+                // Clear existing neighborhoods
+                while (neighborhoodSelect.options.length > 1) {
+                    neighborhoodSelect.remove(1);
+                }
+                
+                const districtId = this.value;
+                if (districtId) {
+                    loadNeighborhoods(neighborhoodSelect, districtId);
+                }
+            }
+        });
+    }
+
+    // --- New Report Form Handler ---
     if (reportForm) {
         reportForm.addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -188,8 +216,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData();
             
             // Add text fields to the form data
-            formData.append('category', event.target.category.value);
-            formData.append('district', event.target.district.value);
+            formData.append('category_id', event.target.category_id.value);
+            formData.append('district_id', event.target.district_id.value);
+            
+            // Add neighborhood_id if it's selected
+            if (event.target.neighborhood_id.value) {
+                formData.append('neighborhood_id', event.target.neighborhood_id.value);
+            }
+            
             formData.append('address', event.target.address.value);
             formData.append('description', event.target.description.value);
             formData.append('user_id', loggedInUser.id);
@@ -211,6 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const response = await fetch('/api/reports', {
                     method: 'POST',
+                    // Don't set Content-Type header - it will be set automatically with the boundary
                     body: formData,
                 });
                 if (!response.ok) {
@@ -247,14 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Category emoji mapping
-            const categoryEmojis = {
-                'pothole': '🕳️',
-                'streetlight': '💡',
-                'bench': '🪑',
-                'trash': '🗑️',
-                'other': '🔧'
-            };
+            // Category emoji mapping is now from the API response (category_icon)
             
             // Status emoji mapping
             const statusEmojis = {
@@ -270,7 +298,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.className = 'report-item';
                 
                 // Get category emoji or default
-                const categoryEmoji = categoryEmojis[report.category] || '🔧';
+                const categoryEmoji = report.category_icon || '🔧';
+                const categoryName = report.category_name || 'Other';
+                const districtName = report.district_name || 'Unknown District';
+                
+                // Get neighborhood name if available
+                let neighborhoodInfo = '';
+                if (report.neighborhood_name) {
+                    neighborhoodInfo = `<p><strong>🏙️ Neighborhood:</strong> ${report.neighborhood_name}`;
+                    if (report.postal_code) {
+                        neighborhoodInfo += ` (${report.postal_code})`;
+                    }
+                    neighborhoodInfo += `</p>`;
+                }
                 
                 // Get status emoji or default
                 const statusEmoji = statusEmojis[report.status] || '❓';
@@ -326,10 +366,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.innerHTML = `
                     <div class="report-layout">
                         <div class="report-details">
-                            <h3>${categoryEmoji} ${report.category.charAt(0).toUpperCase() + report.category.slice(1)} Issue</h3>
+                            <h3>${categoryEmoji} ${categoryName.charAt(0).toUpperCase() + categoryName.slice(1)} Issue</h3>
                             ${userInfoHTML}
                             ${imageHTML}
-                            <p><strong>🏙️ District:</strong> ${report.district}</p>
+                            <p><strong>🏙️ District:</strong> ${districtName}</p>
+                            ${neighborhoodInfo}
                             <p><strong>📮 Address:</strong> ${report.address}</p>
                             ${locationHTML}
                             <p><strong>📝 Description:</strong> ${report.description}</p>
@@ -574,6 +615,108 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
+
+    // New function to load categories from API
+    async function loadCategories(selectElement) {
+        try {
+            const response = await fetch('/api/categories');
+            if (!response.ok) {
+                throw new Error('Failed to fetch categories');
+            }
+            const result = await response.json();
+            const categories = result.data;
+            
+            // Clear existing options except the first "Select Category" option
+            while (selectElement.options.length > 1) {
+                selectElement.remove(1);
+            }
+            
+            // Add categories from API
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = `${category.icon || ''} ${category.name}`;
+                selectElement.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading categories:', error);
+            // Add a default "Other" option if categories can't be loaded
+            const option = document.createElement('option');
+            option.value = "7"; // Assuming "other" is ID 7 based on our default data
+            option.textContent = "Other";
+            selectElement.appendChild(option);
+        }
+    }
+
+    // New function to load districts from API
+    async function loadDistricts(selectElement) {
+        try {
+            const response = await fetch('/api/districts');
+            if (!response.ok) {
+                throw new Error('Failed to fetch districts');
+            }
+            const result = await response.json();
+            const districts = result.data;
+            
+            // Clear existing options except the first "Select District" option
+            while (selectElement.options.length > 1) {
+                selectElement.remove(1);
+            }
+            
+            // Add districts from API
+            districts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district.id;
+                option.textContent = district.name;
+                selectElement.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading districts:', error);
+            // Add a default option if districts can't be loaded
+            const option = document.createElement('option');
+            option.value = "1"; // A default district ID
+            option.textContent = "Unknown District";
+            selectElement.appendChild(option);
+        }
+    }
+
+    // New function to load neighborhoods based on district
+    async function loadNeighborhoods(selectElement, districtId) {
+        try {
+            const response = await fetch(`/api/districts/${districtId}/neighborhoods`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch neighborhoods');
+            }
+            const result = await response.json();
+            const neighborhoods = result.data;
+            
+            // Clear existing options except the first "Select Neighborhood" option
+            while (selectElement.options.length > 1) {
+                selectElement.remove(1);
+            }
+            
+            if (neighborhoods.length === 0) {
+                selectElement.options[0].text = "No neighborhoods available for this district";
+                return;
+            } else {
+                selectElement.options[0].text = "Select Neighborhood (optional)";
+            }
+            
+            // Add neighborhoods from API
+            neighborhoods.forEach(neighborhood => {
+                const option = document.createElement('option');
+                option.value = neighborhood.id;
+                option.textContent = neighborhood.name;
+                if (neighborhood.postal_code) {
+                    option.textContent += ` (${neighborhood.postal_code})`;
+                }
+                selectElement.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading neighborhoods:', error);
+            selectElement.options[0].text = "Error loading neighborhoods";
+        }
+    }
 });
 
 console.log("Istanfix script loaded. Real auth system active."); 

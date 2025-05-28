@@ -154,12 +154,94 @@ app.post('/api/auth/login', (req, res) => {
 
 // --- Reports API Endpoints (Modified) ---
 
-// GET all reports (now includes user info)
+// GET /api/categories - Get all categories
+app.get('/api/categories', (req, res) => {
+    const sql = 'SELECT * FROM categories ORDER BY name';
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ "error": err.message });
+        }
+        res.json({
+            "message": "success",
+            "data": rows
+        });
+    });
+});
+
+// GET /api/districts - Get all districts
+app.get('/api/districts', (req, res) => {
+    const sql = 'SELECT * FROM districts ORDER BY name';
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ "error": err.message });
+        }
+        res.json({
+            "message": "success",
+            "data": rows
+        });
+    });
+});
+
+// GET /api/neighborhoods - Get all neighborhoods
+app.get('/api/neighborhoods', (req, res) => {
+    const sql = `
+        SELECT n.id, n.name, n.postal_code, n.district_id, d.name as district_name
+        FROM neighborhoods n
+        JOIN districts d ON n.district_id = d.id
+        ORDER BY n.name
+    `;
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ "error": err.message });
+        }
+        res.json({
+            "message": "success",
+            "data": rows
+        });
+    });
+});
+
+// GET /api/districts/:districtId/neighborhoods - Get neighborhoods by district
+app.get('/api/districts/:districtId/neighborhoods', (req, res) => {
+    const districtId = req.params.districtId;
+    
+    // Validate districtId is a number
+    if (isNaN(parseInt(districtId))) {
+        return res.status(400).json({ "error": "District ID must be a number." });
+    }
+    
+    const sql = `
+        SELECT n.id, n.name, n.postal_code, n.district_id, d.name as district_name
+        FROM neighborhoods n
+        JOIN districts d ON n.district_id = d.id
+        WHERE n.district_id = ?
+        ORDER BY n.name
+    `;
+    
+    db.all(sql, [districtId], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ "error": err.message });
+        }
+        
+        res.json({
+            "message": "success",
+            "data": rows
+        });
+    });
+});
+
+// GET all reports (now includes user info and category details)
 app.get('/api/reports', (req, res) => {
     const sql = `
-        SELECT reports.*, users.name as user_name 
+        SELECT reports.*, users.name as user_name, 
+               categories.name as category_name, categories.icon as category_icon,
+               districts.name as district_name,
+               n.name as neighborhood_name, n.postal_code
         FROM reports
         LEFT JOIN users ON reports.user_id = users.id
+        LEFT JOIN categories ON reports.category_id = categories.id
+        LEFT JOIN districts ON reports.district_id = districts.id
+        LEFT JOIN neighborhoods n ON reports.neighborhood_id = n.id
         ORDER BY reports.created_at DESC
     `;
     db.all(sql, [], (err, rows) => {
@@ -173,13 +255,53 @@ app.get('/api/reports', (req, res) => {
     });
 });
 
+// GET reports by category_id
+app.get('/api/reports/category/:categoryId', (req, res) => {
+    const categoryId = req.params.categoryId;
+    
+    // Validate categoryId is a number
+    if (isNaN(parseInt(categoryId))) {
+        return res.status(400).json({ "error": "Category ID must be a number." });
+    }
+    
+    const sql = `
+        SELECT reports.*, users.name as user_name, categories.name as category_name, categories.icon as category_icon
+        FROM reports
+        LEFT JOIN users ON reports.user_id = users.id
+        LEFT JOIN categories ON reports.category_id = categories.id
+        WHERE reports.category_id = ?
+        ORDER BY reports.created_at DESC
+    `;
+    
+    db.all(sql, [categoryId], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ "error": err.message });
+        }
+        
+        res.json({
+            "message": "success",
+            "data": rows
+        });
+    });
+});
+
 // POST a new report with image upload
 app.post('/api/reports', upload.single('image'), (req, res) => {
     // Handle the form data which is now in req.body
-    const { category, district, address, description, latitude, longitude, user_id } = req.body; 
+    const { category_id, district_id, neighborhood_id, address, description, latitude, longitude, user_id } = req.body; 
     
-    if (!category || !district || !address || !description || user_id === undefined) {
-        return res.status(400).json({ "error": "Missing required fields: category, district, address, description, user_id." });
+    if (!category_id || !district_id || !address || !description || user_id === undefined) {
+        return res.status(400).json({ "error": "Missing required fields: category_id, district_id, address, description, user_id." });
+    }
+
+    // Validate category_id and district_id
+    if (isNaN(parseInt(category_id)) || isNaN(parseInt(district_id))) {
+        return res.status(400).json({ "error": "category_id and district_id must be numbers." });
+    }
+
+    // Validate neighborhood_id if provided
+    if (neighborhood_id && isNaN(parseInt(neighborhood_id))) {
+        return res.status(400).json({ "error": "neighborhood_id must be a number." });
     }
 
     const lat = latitude !== undefined && latitude !== null && latitude !== '' ? parseFloat(latitude) : null;
@@ -196,8 +318,62 @@ app.post('/api/reports', upload.single('image'), (req, res) => {
         imagePath = `/uploads/${req.file.filename}`;
     }
     
-    const sql = 'INSERT INTO reports (category, district, address, description, latitude, longitude, status, image_path, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    const params = [category, district, address, description, lat, lon, 'open', imagePath, user_id]; 
+    // First check if the category and district exist
+    db.get('SELECT id FROM categories WHERE id = ?', [category_id], (err, category) => {
+        if (err) {
+            return res.status(500).json({ "error": err.message });
+        }
+        
+        if (!category) {
+            return res.status(404).json({ "error": "Category not found" });
+        }
+        
+        db.get('SELECT id FROM districts WHERE id = ?', [district_id], (err, district) => {
+            if (err) {
+                return res.status(500).json({ "error": err.message });
+            }
+            
+            if (!district) {
+                return res.status(404).json({ "error": "District not found" });
+            }
+            
+            // Check if neighborhood exists and belongs to the specified district
+            if (neighborhood_id) {
+                db.get('SELECT id FROM neighborhoods WHERE id = ? AND district_id = ?', [neighborhood_id, district_id], (err, neighborhood) => {
+                    if (err) {
+                        return res.status(500).json({ "error": err.message });
+                    }
+                    
+                    if (!neighborhood) {
+                        return res.status(404).json({ "error": "Neighborhood not found or does not belong to the specified district" });
+                    }
+                    
+                    insertReport(category_id, district_id, neighborhood_id, address, description, lat, lon, imagePath, user_id, res);
+                });
+            } else {
+                // No neighborhood specified, proceed with report creation
+                insertReport(category_id, district_id, null, address, description, lat, lon, imagePath, user_id, res);
+            }
+        });
+    });
+});
+
+function insertReport(category_id, district_id, neighborhood_id, address, description, lat, lon, imagePath, user_id, res) {
+    // Define SQL query based on whether neighborhood_id is provided
+    let sql, params;
+    
+    if (neighborhood_id) {
+        sql = `INSERT INTO reports 
+              (category_id, district_id, neighborhood_id, address, description, latitude, longitude, status, image_path, user_id) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        params = [category_id, district_id, neighborhood_id, address, description, lat, lon, 'open', imagePath, user_id];
+    } else {
+        sql = `INSERT INTO reports 
+              (category_id, district_id, address, description, latitude, longitude, status, image_path, user_id) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        params = [category_id, district_id, address, description, lat, lon, 'open', imagePath, user_id];
+    }
+    
     db.run(sql, params, function(err) {
         if (err) {
             return res.status(500).json({ "error": err.message });
@@ -205,9 +381,15 @@ app.post('/api/reports', upload.single('image'), (req, res) => {
         // Fetch the newly created report with user details to return it
         const newReportId = this.lastID;
         const selectNewReportSql = `
-            SELECT reports.*, users.name as user_name 
+            SELECT reports.*, users.name as user_name, 
+                   categories.name as category_name, categories.icon as category_icon,
+                   districts.name as district_name,
+                   n.name as neighborhood_name, n.postal_code
             FROM reports
             LEFT JOIN users ON reports.user_id = users.id
+            LEFT JOIN categories ON reports.category_id = categories.id
+            LEFT JOIN districts ON reports.district_id = districts.id
+            LEFT JOIN neighborhoods n ON reports.neighborhood_id = n.id
             WHERE reports.id = ?
         `;
         db.get(selectNewReportSql, [newReportId], (selectErr, newReport) => {
@@ -220,7 +402,7 @@ app.post('/api/reports', upload.single('image'), (req, res) => {
             });
         });
     });
-});
+}
 
 // PUT /api/reports/:id/status (Update report status with role-based permissions)
 app.put('/api/reports/:id/status', (req, res) => {
@@ -304,12 +486,15 @@ app.delete('/api/reports/:id', (req, res) => {
 app.get('/api/reports/:reportId/comments', (req, res) => {
     const reportId = req.params.reportId;
     
+    // Belirli bir rapora ait tüm yorumları kullanıcı bilgileriyle birlikte getirir
+    // Önce yorumları (comments) alır, sonra her yorum için kullanıcı (users) bilgilerini ekler
+    // Yorumlar oluşturulma tarihine göre artan sırada listelenir (eskiden yeniye)
     const sql = `
-        SELECT c.*, u.name as user_name, u.role as user_role
-        FROM comments c
-        LEFT JOIN users u ON c.user_id = u.id
-        WHERE c.report_id = ?
-        ORDER BY c.created_at ASC
+        SELECT comments.*, users.name as user_name, users.role as user_role
+        FROM comments
+        LEFT JOIN users ON comments.user_id = users.id
+        WHERE comments.report_id = ?
+        ORDER BY comments.created_at ASC
     `;
     
     db.all(sql, [reportId], (err, rows) => {

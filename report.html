@@ -36,19 +36,25 @@
             <h2>Create New Report</h2>
             <form id="new-report-form">
                 <div>
-                    <label for="category">Category:</label>
-                    <select id="category" name="category" required>
+                    <label for="category_id">Category:</label>
+                    <select id="category_id" name="category_id" required>
                         <option value="">Select Category</option>
-                        <option value="pothole">Pothole</option>
-                        <option value="streetlight">Broken Streetlight</option>
-                        <option value="bench">Damaged Bench</option>
-                        <option value="trash">Trash/Waste</option>
-                        <option value="other">Other</option>
+                        <!-- Categories will be loaded from API -->
                     </select>
                 </div>
                 <div>
-                    <label for="district">District:</label>
-                    <input type="text" id="district" name="district" required>
+                    <label for="district_id">District:</label>
+                    <select id="district_id" name="district_id" required>
+                        <option value="">Select District</option>
+                        <!-- Districts will be loaded from API -->
+                    </select>
+                </div>
+                <div>
+                    <label for="neighborhood_id">Neighborhood:</label>
+                    <select id="neighborhood_id" name="neighborhood_id">
+                        <option value="">Select Neighborhood (optional)</option>
+                        <!-- Neighborhoods will be loaded from API based on selected district -->
+                    </select>
                 </div>
                 <div>
                     <label for="address">Address Details:</label>
